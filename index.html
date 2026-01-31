@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Tasks & Win Rewards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(180deg, #FF9933 0%, #FFF8E7 50%, #138808 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: #FFFBF0;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 3px solid #FF9933;
+        }
+
+        .header {
+            background: linear-gradient(180deg, #FF9933 0%, #FFE5B4 50%, #138808 100%);
+            color: #333;
+            padding: 50px 20px 30px 160px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header #candidateImage {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            /* white border removed as requested */
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            object-fit: cover;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .language-selector select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 2px solid #138808;
+            background: #FFFBF0;
+            color: #333;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .language-selector select:hover {
+            border-color: #FF9933;
+            background: #FFF8E7;
+        }
+
+        .language-selector select option {
+            background: #FFFBF0;
+            color: #333;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: #2d2d2d;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px 20px;
+            background: #FFFBF0;
+        }
+
+        .progress-bar-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #FFE5B4;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #FF9933;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF9933 0%, #138808 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .task-card {
+            background: #FFF8E7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #FFD580;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 153, 51, 0.1);
+        }
+
+        .task-card.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .task-card.completed {
+            background: linear-gradient(135deg, #FFF5E6 0%, #E8F5E9 100%);
+            border-color: #138808;
+            box-shadow: 0 4px 12px rgba(19, 136, 8, 0.2);
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .task-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            padding: 8px;
+        }
+
+        .task-icon.youtube {
+            background: #FF0000;
+        }
+
+        .task-icon.instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .task-icon.facebook {
+            background: #1877f2;
+        }
+
+        .task-icon.completed-icon {
+            background: #138808;
+            color: white;
+            font-size: 24px;
+        }
+
+        .task-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        .task-title {
+            flex: 1;
+        }
+
+        .task-title h3 {
+            font-size: 18px;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        .task-title p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .task-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.4);
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+            }
+        }
+
+        .timer-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .verification-message {
+            background: #FFEBE0;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 12px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.15);
+        }
+
+        .verification-message h4 {
+            color: #c62828;
+            font-size: 15px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .verification-message p {
+            color: #d32f2f;
+            font-size: 13px;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .reward-form {
+            display: none;
+            background: linear-gradient(180deg, #FFF5E6 0%, #FFFFFF 50%, #E8F5E9 100%);
+            border: 3px solid #FF9933;
+            border-radius: 12px;
+            padding: 40px 25px;
+            margin-top: 30px;
+            animation: slideIn 0.5s ease;
+            text-align: center;
+        }
+
+        .reward-form.visible {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reward-form h2 {
+            color: #FF9933;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+
+        .blocked-message {
+            text-align: center;
+            padding: 40px 20px;
+            background: #FFF8E7;
+            border-radius: 12px;
+        }
+
+        .blocked-message h2 {
+            color: #FF9933;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .blocked-message p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Final celebration image - larger and fixed (no bump) */
+        .success-message .emoji {
+            display: block;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 20px auto; /* center and add spacing below */
+            animation: none !important; /* ensure no animation */
+            max-width: 90%;
+        }
+
+        .success-message .emoji img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+        }
+
+        .success-message h2 {
+            color: #FF9933;
+            margin-bottom: 15px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .success-message p {
+            color: #138808;
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            top: -20px;
+            animation: confetti-fall 3s linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .lock-icon {
+            font-size: 16px;
+            color: #999;
+        }
+
+        .optional-badge {
+            font-size: 12px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .skip-section {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #FFE5B4;
+            border-radius: 8px;
+            opacity: 0.8;
+            border: 1px solid #FFD580;
+        }
+
+        .skip-section.visible {
+            display: block;
+        }
+
+        .skip-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .skip-checkbox:last-child {
+            margin-bottom: 0;
+        }
+
+        .skip-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .skip-checkbox span {
+            user-select: none;
+        }
+
+        .submit-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .submit-section.visible {
+            display: block;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:disabled {
+            background: #D3D3D3;
+            color: #888;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-submit:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.4);
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 45px 15px 25px 110px;
+            }
+
+            .header #candidateImage {
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 88px;
+                height: 88px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .header p {
+                font-size: 14px;
+            }
+
+            .language-selector {
+                top: 8px;
+                right: 8px;
+            }
+
+            .language-selector select {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
+            .task-title h3 {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            .success-message .emoji {
+                width: 160px;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img id="candidateImage" src="header.png" alt="Candidate">
+            <div class="language-selector">
+                <select id="languageSelect" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="te">తెలుగు</option>
+                </select>
+            </div>
+            <h1 id="headerTitle">📣 Support Vadinarayana</h1>
+            <p id="headerSubtitle">Join the campaign — complete these simple steps to show your support</p>
+        </div>
+
+        <div class="content" id="mainContent">
+            <div class="progress-bar-container">
+                <div class="progress-label"><span id="progressLabel">Progress:</span> <span id="progressText">0/3</span></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="task-card" id="task1">
+                <div class="task-header">
+                    <div class="task-icon youtube" id="icon1">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <div class="task-title">
+                        <h3 id="task1Title">Task 1: Subscribe on YouTube</h3>
+                        <p id="task1Desc">Click the button to visit our channel</p>
+                    </div>
+                </div>
+                <div class="task-buttons">
+                    <button class="btn btn-primary" id="actionBtn1" onclick="handleTaskClick(1, 'youtube')">
+                        <span id="task1BtnText">Visit YouTube Channel</span>
+                    </button>
+                </div>
+                <div id="message1"></div>
+            </div>
+
+            <div class="task-card locked" id="task2">
+                <div class="task-header">
+                    <div class="task-icon instagram" id="icon2">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </div>
+                    <div class="task-title">
+                        <h3><span id="task2Title">Task 2: Follow on Instagram</span> <span class="optional-badge" id="optionalBadge1">(Optional)</span> <span class="lock-icon">🔒</span></h3>
+                        <p id="task2Desc">Complete Task 1 to unlock</p>
+                    </div>
+                </div>
+                <div class="task-buttons">
+                    <button class="btn btn-primary" id="actionBtn2" onclick="handleTaskClick(2, 'instagram')">
+                        <span id="task2BtnText">Visit Instagram Profile</span>
+                    </button>
+                </div>
+                <div id="message2"></div>
+            </div>
+
+            <div class="task-card locked" id="task3">
+                <div class="task-header">
+                    <div class="task-icon facebook" id="icon3">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </div>
+                    <div class="task-title">
+                        <h3><span id="task3Title">Task 3: Follow on Facebook</span> <span class="optional-badge" id="optionalBadge2">(Optional)</span> <span class="lock-icon">🔒</span></h3>
+                        <p id="task3Desc">Complete Task 1 to unlock</p>
+                    </div>
+                </div>
+                <div class="task-buttons">
+                    <button class="btn btn-primary" id="actionBtn3" onclick="handleTaskClick(3, 'facebook')">
+                        <span id="task3BtnText">Visit Facebook Page</span>
+                    </button>
+                </div>
+                <div id="message3"></div>
+            </div>
+
+            <div class="skip-section" id="skipSection">
+                <label class="skip-checkbox">
+                    <input type="checkbox" id="skipInstagram" onchange="handleSkipChange()">
+                    <span id="skipInstagramText">I don't have Instagram</span>
+                </label>
+                <label class="skip-checkbox">
+                    <input type="checkbox" id="skipFacebook" onchange="handleSkipChange()">
+                    <span id="skipFacebookText">I don't have Facebook</span>
+                </label>
+            </div>
+
+            <div class="submit-section" id="submitSection">
+                <button class="btn-submit" id="finalSubmitBtn" onclick="handleFinalSubmit()" disabled>
+                    <span id="submitBtnText">Submit</span>
+                </button>
+            </div>
+
+            <div class="reward-form" id="rewardForm">
+                <div class="success-message">
+                    <img src="final.png" id="finalImage" alt="Celebration" class="emoji">
+                    <h2 id="congratsTitle">Congratulations!</h2>
+                    <p id="congratsMessage">Your token number is</p>
+                    <p id="tokenNumber" style="font-size: 24px; font-weight: 700; color: #FF9933; margin-top: 15px; letter-spacing: 2px;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'alreadyParticipated';
+        const FINGERPRINT_KEY = 'deviceFingerprint';
+        const PROGRESS_KEY = 'taskProgress';
+        const LANGUAGE_KEY = 'selectedLanguage';
+        const TIMER_DURATION = 8;
+
+        let currentLanguage = 'en';
+
+        const translations = {
+            en: {
+                headerTitle: '📣 Support Vadinarayana',
+                headerSubtitle: 'Join the campaign — complete these simple steps to show your support',
+                progressLabel: 'Progress:',
+                task1Title: 'Task 1: Subscribe on YouTube',
+                task1Desc: 'Click the button to visit our channel',
+                task1BtnText: 'Visit YouTube Channel',
+                task2Title: 'Task 2: Follow on Instagram',
+                task2Desc: 'Complete Task 1 to unlock',
+                task2DescUnlocked: 'Click the button to visit our Instagram',
+                task2BtnText: 'Visit Instagram Profile',
+                task3Title: 'Task 3: Follow on Facebook',
+                task3Desc: 'Complete Task 1 to unlock',
+                task3DescUnlocked: 'Click the button to visit our Facebook',
+                task3BtnText: 'Visit Facebook Page',
+                optionalBadge: '(Optional)',
+                skipInstagram: "I don't have Instagram",
+                skipFacebook: "I don't have Facebook",
+                submitBtn: 'Submit',
+                congratsTitle: 'Congratulations!',
+                congratsMessage: 'Your token number is',
+                alreadyParticipatedTitle: '⚠️ Already Participated',
+                alreadyParticipatedMessage: 'You have already participated from this device.<br>Each person can only participate once.',
+                alreadyParticipatedFooter: 'Thank you for your interest!',
+                actionRequiredYoutube: '⚠️ Action Required',
+                actionMessageYoutube: 'Please SUBSCRIBE to our YouTube channel to proceed. This is mandatory. Click the button again after subscribing.',
+                actionRequiredInstagram: '⚠️ Action Required',
+                actionMessageInstagram: 'Please FOLLOW our Instagram profile to proceed. Click the button again after following.',
+                actionRequiredFacebook: '⚠️ Action Required',
+                actionMessageFacebook: 'Please FOLLOW our Facebook page to proceed. Click the button again after following.',
+                taskCompleted: '✓ Task completed successfully!',
+                completedBtn: 'Completed ✓'
+            },
+            kn: {
+                headerTitle: '📣 ವಾದಿನಾರಾಯಣ ಅವರನ್ನು ಬೆಂಬಲಿಸಿ',
+                headerSubtitle: 'ಪ್ರಚಾರಕ್ಕೆ ಸೇರಿ — ಬೆಂಬಲವನ್ನು ತೋರಿಸಲು ಈ ಸರಳ ಕ್ರಮಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ',
+                progressLabel: 'ಪ್ರಗತಿ:',
+                task1Title: 'ಕಾರ್ಯ 1: YouTube ನಲ್ಲಿ ಚಂದಾದಾರರಾಗಿ',
+                task1Desc: 'ನಮ್ಮ ಚಾನೆಲ್ ಗೆ ಭೇಟಿ ನೀಡಲು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ',
+                task1BtnText: 'YouTube ಚಾನೆಲ್ ಗೆ ಭೇಟಿ ನೀಡಿ',
+                task2Title: 'ಕಾರ್ಯ 2: Instagram ನಲ್ಲಿ ಫಾಲೋ ಮಾಡಿ',
+                task2Desc: 'ಅನ್ಲಾಕ್ ಮಾಡಲು ಕಾರ್ಯ 1 ಪೂರ್ಣಗೊಳಿಸಿ',
+                task2DescUnlocked: 'ನಮ್ಮ Instagram ಗೆ ಭೇಟಿ ನೀಡಲು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ',
+                task2BtnText: 'Instagram ಪ್ರೊಫೈಲ್ ಗೆ ಭೇಟಿ ನೀಡಿ',
+                task3Title: 'ಕಾರ್ಯ 3: Facebook ನಲ್ಲಿ ಫಾಲೋ ಮಾಡಿ',
+                task3Desc: 'ಅನ್ಲಾಕ್ ಮಾಡಲು ಕಾರ್ಯ 1 ಪೂರ್ಣಗೊಳಿಸಿ',
+                task3DescUnlocked: 'ನಮ್ಮ Facebook ಗೆ ಭೇಟಿ ನೀಡಲು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ',
+                task3BtnText: 'Facebook ಪುಟಕ್ಕೆ ಭೇಟಿ ನೀಡಿ',
+                optionalBadge: '(ಐಚ್ಛಿಕ)',
+                skipInstagram: 'ನನಗೆ Instagram ಇಲ್ಲ',
+                skipFacebook: 'ನನಗೆ Facebook ಇಲ್ಲ',
+                submitBtn: 'ಸಲ್ಲಿಸಿ',
+                congratsTitle: 'ಅಭಿನಂದನೆಗಳು!',
+                congratsMessage: 'ನಿಮ್ಮ ಟೋಕನ್ ಸಂಖ್ಯೆ',
+                alreadyParticipatedTitle: '⚠️ ಈಗಾಗಲೇ ಭಾಗವಹಿಸಿದ್ದೀರಿ',
+                alreadyParticipatedMessage: 'ನೀವು ಈಗಾಗಲೇ ಈ ಸಾಧನದಿಂದ ಭಾಗವಹಿಸಿದ್ದೀರಿ.<br>ಪ್ರತಿಯೊಬ್ಬ ವ್ಯಕ್ತಿ ಕೇವಲ ಒಮ್ಮೆ ಮಾತ್ರ ಭಾಗವಹಿಸಬಹುದು.',
+                alreadyParticipatedFooter: 'ನಿಮ್ಮ ಆಸಕ್ತಿಗೆ ಧನ್ಯವಾದಗಳು!',
+                actionRequiredYoutube: '⚠️ ಕ್ರಿಯೆ ಅಗತ್ಯವಿದೆ',
+                actionMessageYoutube: 'ದಯವಿಟ್ಟು ಮುಂದುವರಿಯಲು ನಮ್ಮ YouTube ಚಾನೆಲ್ ಗೆ ಚಂದಾದಾರರಾಗಿ. ಇದು ಕಡ್ಡಾಯವಾಗಿದೆ. ಚಂದಾದಾರರಾದ ನಂತರ ಮತ್ತೆ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.',
+                actionRequiredInstagram: '⚠️ ಕ್ರಿಯೆ ಅಗತ್ಯವಿದೆ',
+                actionMessageInstagram: 'ದಯವಿಟ್ಟು ಮುಂದುವರಿಯಲು ನಮ್ಮ Instagram ಪ್ರೊಫೈಲ್ ಅನ್ನು ಫಾಲೋ ಮಾಡಿ. ಫಾಲೋ ಮಾಡಿದ ನಂತರ ಮತ್ತೆ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.',
+                actionRequiredFacebook: '⚠️ ಕ್ರಿಯೆ ಅಗತ್ಯವಿದೆ',
+                actionMessageFacebook: 'ದಯವಿಟ್ಟು ಮುಂದುವರಿಯಲು ನಮ್ಮ Facebook ಪುಟವನ್ನು ಫಾಲೋ ಮಾಡಿ. ಫಾಲೋ ಮಾಡಿದ ನಂತರ ಮತ್ತೆ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.',
+                taskCompleted: '✓ ಕಾರ್ಯ ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಂಡಿದೆ!',
+                completedBtn: 'ಪೂರ್ಣಗೊಂಡಿದೆ ✓'
+            },
+            te: {
+                headerTitle: '📣 వాదినారాయణకు మద్దతు చెప్పండి',
+                headerSubtitle: 'ప్రచారంలో చేరండి — మద్దతును చూపించడానికి ఈ సింపుల్ స్టెప్స్‌ను పూర్తి చేయండి',
+                progressLabel: 'పురోగతి:',
+                task1Title: 'టాస్క్ 1: YouTube లో సబ్‌స్క్రైబ్ చేయండి',
+                task1Desc: 'మా ఛానెల్‌ను సందర్శించడానికి బటన్‌ను క్లిక్ చేయండి',
+                task1BtnText: 'YouTube ఛానెల్‌ను సందర్శించండి',
+                task2Title: 'టాస్క్ 2: Instagram లో ఫాలో చేయండి',
+                task2Desc: 'అన్‌లాక్ చేయడానికి టాస్క్ 1 పూర్తి చేయండి',
+                task2DescUnlocked: 'మా Instagram ను సందర్శించడానికి బటన్‌ను క్లిక్ చేయండి',
+                task2BtnText: 'Instagram ప్రొఫైల్‌ను సందర్శించండి',
+                task3Title: 'టాస్క్ 3: Facebook లో ఫాలో చేయండి',
+                task3Desc: 'అన్‌లాక్ చేయడానికి టాస్క్ 1 పూర్తి చేయండి',
+                task3DescUnlocked: 'మా Facebook ను సందర్శించడానికి బటన్‌ను క్లిక్ చేయండి',
+                task3BtnText: 'Facebook పేజీని సందర్శించండి',
+                optionalBadge: '(ఐచ్ఛికం)',
+                skipInstagram: 'నాకు Instagram లేదు',
+                skipFacebook: 'నాకు Facebook లేదు',
+                submitBtn: 'సమర్పించండి',
+                congratsTitle: 'అభినందనలు!',
+                congratsMessage: 'మీ టోకెన్ నంబర్',
+                alreadyParticipatedTitle: '⚠️ ఇప్పటికే పాల్గొన్నారు',
+                alreadyParticipatedMessage: 'మీరు ఇప్పటికే ఈ పరికరం నుండి పాల్గొన్నారు.<br>ప్రతి వ్యక్తి ఒకసారి మాత్రమే పాల్గొనవచ్చు.',
+                alreadyParticipatedFooter: 'మీ ఆసక్తికి ధన్యవాదాలు!',
+                actionRequiredYoutube: '⚠️ చర్య అవసరం',
+                actionMessageYoutube: 'దయచేసి కొనసాగడానికి మా YouTube ఛానెల్‌కు సబ్‌స్క్రైబ్ చేయండి. ఇది తప్పనిసరి. సబ్‌స్క్రైబ్ చేసిన తర్వాత మళ్లీ బటన్‌ను క్లిక్ చేయండి.',
+                actionRequiredInstagram: '⚠️ చర్య అవసరం',
+                actionMessageInstagram: 'దయచేసి కొనసాగడానికి మా Instagram ప్రొఫైల్‌ను ఫాలో చేయండి. ఫాలో చేసిన తర్వాత మళ్లీ బటన్‌ను క్లిక్ చేయండి.',
+                actionRequiredFacebook: '⚠️ చర్య అవసరం',
+                actionMessageFacebook: 'దయచేసి కొనసాగడానికి మా Facebook పేజీని ఫాలో చేయండి. ఫాలో చేసిన తర్వాత మళ్లీ బటన్‌ను క్లిక్ చేయండి.',
+                taskCompleted: '✓ టాస్క్ విజయవంతంగా పూర్తయింది!',
+                completedBtn: 'పూర్తయింది ✓'
+            }
+        };
+
+        const socialLinks = {
+            youtube: 'https://youtube.com/@vadinarayana3456?si=SBqaHY8qsjQ7nEU0',
+            instagram: 'https://www.instagram.com/v_adinarayana_',
+            facebook: 'https://www.facebook.com/yourpage'
+        };
+
+        let taskState = {
+            task1: { completed: false, firstClick: false, verificationShown: false },
+            task2: { completed: false, firstClick: false, verificationShown: false, skipped: false },
+            task3: { completed: false, firstClick: false, verificationShown: false, skipped: false }
+        };
+
+        function getPlatformMessages() {
+            const lang = translations[currentLanguage];
+            return {
+                youtube: {
+                    title: lang.actionRequiredYoutube,
+                    message: lang.actionMessageYoutube
+                },
+                instagram: {
+                    title: lang.actionRequiredInstagram,
+                    message: lang.actionMessageInstagram
+                },
+                facebook: {
+                    title: lang.actionRequiredFacebook,
+                    message: lang.actionMessageFacebook
+                }
+            };
+        }
+
+        function generateFingerprint() {
+            const userAgent = navigator.userAgent;
+            const screenSize = `${screen.width}x${screen.height}`;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            return btoa(`${userAgent}-${screenSize}-${timezone}`);
+        }
+
+        function checkParticipation() {
+            const participated = localStorage.getItem(STORAGE_KEY);
+
+            if (participated === 'true') {
+                showBlockedMessage();
+                return true;
+            }
+
+            return false;
+        }
+
+        function saveProgress() {
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(taskState));
+        }
+
+        function loadProgress() {
+            const savedProgress = localStorage.getItem(PROGRESS_KEY);
+            if (savedProgress) {
+                try {
+                    const progress = JSON.parse(savedProgress);
+                    taskState = progress;
+                    restoreTaskUI();
+                } catch (e) {
+                    console.error('Failed to load progress:', e);
+                }
+            }
+        }
+
+        function restoreTaskUI() {
+            for (let i = 1; i <= 3; i++) {
+                const task = taskState[`task${i}`];
+                
+                if (task.completed) {
+                    const taskCard = document.getElementById(`task${i}`);
+                    taskCard.classList.add('completed');
+                    
+                    const icon = document.getElementById(`icon${i}`);
+                    icon.className = 'task-icon completed-icon';
+                    icon.textContent = '✓';
+                    
+                    const actionBtn = document.getElementById(`actionBtn${i}`);
+                    actionBtn.textContent = 'Completed ✓';
+                    actionBtn.disabled = true;
+                    actionBtn.style.background = '#138808';
+                    actionBtn.style.cursor = 'not-allowed';
+                    
+                    const messageDiv = document.getElementById(`message${i}`);
+                    messageDiv.innerHTML = '<div class="timer-text" style="color: #4caf50; font-weight: 600;">✓ Task completed successfully!</div>';
+                } else if (task.verificationShown) {
+                    const platform = i === 1 ? 'youtube' : i === 2 ? 'instagram' : 'facebook';
+                    showVerificationMessage(i, platform);
+                } else if (task.skipped && i > 1) {
+                    markTaskAsSkipped(i);
+                }
+            }
+            
+            if (taskState.task1.completed) {
+                unlockOptionalTasks();
+            }
+            
+            if (taskState.task2.skipped) {
+                document.getElementById('skipInstagram').checked = true;
+            }
+            if (taskState.task3.skipped) {
+                document.getElementById('skipFacebook').checked = true;
+            }
+            
+            updateProgress();
+            checkSubmitButtonState();
+        }
+
+        function showBlockedMessage() {
+            const lang = translations[currentLanguage];
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = `
+                <div class="blocked-message">
+                    <h2>${lang.alreadyParticipatedTitle}</h2>
+                    <p>${lang.alreadyParticipatedMessage}</p>
+                    <p style="margin-top: 20px; font-size: 14px; color: #999;">${lang.alreadyParticipatedFooter}</p>
+                </div>
+            `;
+        }
+
+        function handleTaskClick(taskNum, platform) {
+            const task = taskState[`task${taskNum}`];
+            
+            if (task.completed) {
+                return;
+            }
+
+            if (!task.firstClick) {
+                task.firstClick = true;
+                window.open(socialLinks[platform], '_blank');
+                showVerificationMessage(taskNum, platform);
+                saveProgress();
+            } else if (task.verificationShown) {
+                window.open(socialLinks[platform], '_blank');
+                
+                setTimeout(() => {
+                    completeTask(taskNum);
+                }, 2000);
+            }
+        }
+
+        function showVerificationMessage(taskNum, platform) {
+            const task = taskState[`task${taskNum}`];
+            task.verificationShown = true;
+
+            const messageDiv = document.getElementById(`message${taskNum}`);
+            const platformMessages = getPlatformMessages();
+            const platformMsg = platformMessages[platform];
+            
+            messageDiv.innerHTML = `
+                <div class="verification-message">
+                    <h4>${platformMsg.title}</h4>
+                    <p>${platformMsg.message}</p>
+                </div>
+            `;
+
+            const actionBtn = document.getElementById(`actionBtn${taskNum}`);
+            actionBtn.className = 'btn btn-verify';
+        }
+
+        function completeTask(taskNum) {
+            taskState[`task${taskNum}`].completed = true;
+            saveProgress();
+
+            const lang = translations[currentLanguage];
+            const taskCard = document.getElementById(`task${taskNum}`);
+            taskCard.classList.add('completed');
+
+            const icon = document.getElementById(`icon${taskNum}`);
+            icon.className = 'task-icon completed-icon';
+            icon.textContent = '✓';
+
+            const actionBtn = document.getElementById(`actionBtn${taskNum}`);
+            actionBtn.innerHTML = `<span>${lang.completedBtn}</span>`;
+            actionBtn.disabled = true;
+            actionBtn.style.background = '#138808';
+            actionBtn.style.cursor = 'not-allowed';
+
+            const messageDiv = document.getElementById(`message${taskNum}`);
+            messageDiv.innerHTML = `<div class="timer-text" style="color: #4caf50; font-weight: 600;">${lang.taskCompleted}</div>`;
+
+            updateProgress();
+
+            if (taskNum === 1) {
+                unlockOptionalTasks();
+            }
+
+            checkSubmitButtonState();
+        }
+
+        function unlockOptionalTasks() {
+            const lang = translations[currentLanguage];
+            const task2 = document.getElementById('task2');
+            const task3 = document.getElementById('task3');
+            
+            task2.classList.remove('locked');
+            task3.classList.remove('locked');
+
+            const lockIcon2 = task2.querySelector('.lock-icon');
+            const lockIcon3 = task3.querySelector('.lock-icon');
+            
+            if (lockIcon2) lockIcon2.remove();
+            if (lockIcon3) lockIcon3.remove();
+
+            document.getElementById('task2Desc').textContent = lang.task2DescUnlocked;
+            document.getElementById('task3Desc').textContent = lang.task3DescUnlocked;
+            
+            document.getElementById('skipSection').classList.add('visible');
+            document.getElementById('submitSection').classList.add('visible');
+        }
+
+        function handleSkipChange() {
+            const skipInstagram = document.getElementById('skipInstagram').checked;
+            const skipFacebook = document.getElementById('skipFacebook').checked;
+            
+            if (skipInstagram && !taskState.task2.completed) {
+                taskState.task2.skipped = true;
+                markTaskAsSkipped(2);
+            } else if (!skipInstagram && taskState.task2.skipped) {
+                taskState.task2.skipped = false;
+                unmarkTaskAsSkipped(2);
+            }
+            
+            if (skipFacebook && !taskState.task3.completed) {
+                taskState.task3.skipped = true;
+                markTaskAsSkipped(3);
+            } else if (!skipFacebook && taskState.task3.skipped) {
+                taskState.task3.skipped = false;
+                unmarkTaskAsSkipped(3);
+            }
+            
+            saveProgress();
+            checkSubmitButtonState();
+        }
+
+        function markTaskAsSkipped(taskNum) {
+            const taskCard = document.getElementById(`task${taskNum}`);
+            taskCard.style.opacity = '0.5';
+            
+            const actionBtn = document.getElementById(`actionBtn${taskNum}`);
+            actionBtn.disabled = true;
+            actionBtn.style.cursor = 'not-allowed';
+        }
+
+        function unmarkTaskAsSkipped(taskNum) {
+            const taskCard = document.getElementById(`task${taskNum}`);
+            taskCard.style.opacity = '1';
+            
+            const actionBtn = document.getElementById(`actionBtn${taskNum}`);
+            actionBtn.disabled = false;
+            actionBtn.style.cursor = 'pointer';
+        }
+
+        function checkSubmitButtonState() {
+            const submitBtn = document.getElementById('finalSubmitBtn');
+            
+            const youtubeCompleted = taskState.task1.completed;
+            const instagramDone = taskState.task2.completed || taskState.task2.skipped;
+            const facebookDone = taskState.task3.completed || taskState.task3.skipped;
+            
+            if (youtubeCompleted && instagramDone && facebookDone) {
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        function handleFinalSubmit() {
+            unlockRewardForm();
+        }
+
+        function updateProgress() {
+            let completedCount = 0;
+            if (taskState.task1.completed) completedCount++;
+            if (taskState.task2.completed || taskState.task2.skipped) completedCount++;
+            if (taskState.task3.completed || taskState.task3.skipped) completedCount++;
+            
+            const progressPercent = (completedCount / 3) * 100;
+
+            document.getElementById('progressText').textContent = `${completedCount}/3`;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+        }
+
+        function generateToken() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let token = '';
+            for (let i = 0; i < 8; i++) {
+                token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return token;
+        }
+
+        function unlockRewardForm() {
+            const token = generateToken();
+            const lang = translations[currentLanguage];
+            
+            const rewardForm = document.getElementById('rewardForm');
+            rewardForm.classList.add('visible');
+            
+            document.getElementById('congratsMessage').textContent = lang.congratsMessage;
+            document.getElementById('tokenNumber').textContent = token;
+
+            rewardForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            createConfetti();
+            
+            localStorage.setItem(STORAGE_KEY, 'true');
+            localStorage.removeItem(PROGRESS_KEY);
+        }
+
+        function createConfetti() {
+            const colors = ['#FF9933', '#138808', '#FFFFFF', '#FFD580', '#4caf50'];
+            const body = document.body;
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    confetti.style.width = (8 + Math.random() * 6) + 'px';
+                    confetti.style.height = (8 + Math.random() * 6) + 'px';
+                    body.appendChild(confetti);
+
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            currentLanguage = select.value;
+            localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+            updateUILanguage();
+        }
+
+        function updateUILanguage() {
+            const lang = translations[currentLanguage];
+            
+            document.getElementById('headerTitle').textContent = lang.headerTitle;
+            document.getElementById('headerSubtitle').textContent = lang.headerSubtitle;
+            document.getElementById('progressLabel').textContent = lang.progressLabel;
+            
+            document.getElementById('task1Title').textContent = lang.task1Title;
+            document.getElementById('task1Desc').textContent = lang.task1Desc;
+            document.getElementById('task1BtnText').textContent = lang.task1BtnText;
+            
+            document.getElementById('task2Title').textContent = lang.task2Title;
+            document.getElementById('optionalBadge1').textContent = lang.optionalBadge;
+            
+            if (taskState.task1.completed) {
+                document.getElementById('task2Desc').textContent = lang.task2DescUnlocked;
+            } else {
+                document.getElementById('task2Desc').textContent = lang.task2Desc;
+            }
+            document.getElementById('task2BtnText').textContent = lang.task2BtnText;
+            
+            document.getElementById('task3Title').textContent = lang.task3Title;
+            document.getElementById('optionalBadge2').textContent = lang.optionalBadge;
+            
+            if (taskState.task1.completed) {
+                document.getElementById('task3Desc').textContent = lang.task3DescUnlocked;
+            } else {
+                document.getElementById('task3Desc').textContent = lang.task3Desc;
+            }
+            document.getElementById('task3BtnText').textContent = lang.task3BtnText;
+            
+            document.getElementById('skipInstagramText').textContent = lang.skipInstagram;
+            document.getElementById('skipFacebookText').textContent = lang.skipFacebook;
+            document.getElementById('submitBtnText').textContent = lang.submitBtn;
+            
+            document.getElementById('congratsTitle').textContent = lang.congratsTitle;
+            document.getElementById('congratsMessage').textContent = lang.congratsMessage;
+            
+            for (let i = 1; i <= 3; i++) {
+                const task = taskState[`task${i}`];
+                if (task.completed) {
+                    const actionBtn = document.getElementById(`actionBtn${i}`);
+                    actionBtn.innerHTML = `<span>${lang.completedBtn}</span>`;
+                    
+                    const messageDiv = document.getElementById(`message${i}`);
+                    messageDiv.innerHTML = `<div class="timer-text" style="color: #4caf50; font-weight: 600;">${lang.taskCompleted}</div>`;
+                } else if (task.verificationShown) {
+                    const platform = i === 1 ? 'youtube' : i === 2 ? 'instagram' : 'facebook';
+                    const platformMessages = getPlatformMessages();
+                    const platformMsg = platformMessages[platform];
+                    const messageDiv = document.getElementById(`message${i}`);
+                    messageDiv.innerHTML = `
+                        <div class="verification-message">
+                            <h4>${platformMsg.title}</h4>
+                            <p>${platformMsg.message}</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function loadLanguage() {
+            const savedLanguage = localStorage.getItem(LANGUAGE_KEY);
+            if (savedLanguage && translations[savedLanguage]) {
+                currentLanguage = savedLanguage;
+                document.getElementById('languageSelect').value = currentLanguage;
+            }
+            updateUILanguage();
+        }
+
+        window.onload = function() {
+            if (checkParticipation()) {
+                return;
+            }
+            loadLanguage();
+            loadProgress();
+        };
+    </script>
+</body>
+</html>
